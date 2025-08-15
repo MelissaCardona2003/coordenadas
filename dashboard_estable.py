@@ -11,6 +11,8 @@ import folium
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 from io import BytesIO
+from data_loader import to_excel
+
 
 # Configuración de la página
 st.set_page_config(
@@ -243,7 +245,7 @@ def main():
     st.sidebar.markdown("### 🔧 Navegación")
     vista = st.sidebar.selectbox(
         "Selecciona la vista:",
-        ["🔍 Explorar por Granja", "🗺️ Mapas Interactivos", "📈 Estadísticas", "📋 Datos"]
+        ["🔍 Explorar por Granja", "🗺️ Mapas", "📈 Estadísticas", "📋 Datos"]
     )
     
     # Métricas sidebar
@@ -310,14 +312,22 @@ def main():
                                      'Comunidad_Municipio', 'Distancia_km']]
             
             st.dataframe(comunidades_detalle, hide_index=True, use_container_width=True)
-    
-    elif vista == "🗺️ Mapas Interactivos":
-        st.markdown("## 🗺️ Mapas Interactivos")
+
+            col_csv, col_excel = st.columns(2)
+            with col_csv:
+                csv_com = comunidades_detalle.to_csv(index=False)
+                st.download_button("📥 Descargar CSV", csv_com, f"comunidades_cercanas_granja_{granja_seleccionada}.csv", "text/csv")
+            with col_excel:
+                excel_com = to_excel(comunidades_detalle)
+                st.download_button("📥 Descargar Excel", excel_com, f"comunidades_cercanas_granja_{granja_seleccionada}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                
+    elif vista == "🗺️ Mapas":
+        st.markdown("## 🗺️ Mapas")
         
         tab1, tab2 = st.tabs(["🗺️ Mapa Estable (Folium)", "📍 Mapa Plotly"])
         
         with tab1:
-            st.markdown("### 🗺️ Mapa Interactivo Optimizado")
+            st.markdown("### 🗺️ Mapa Interactivo")
             st.info("🔴 **Granjas Solares** | 🔵 **Comunidades Energéticas** (muestra reducida para estabilidad)")
             
             with st.spinner("🔄 Generando mapa estable..."):
@@ -380,18 +390,38 @@ def main():
             
             df_principal = pd.DataFrame(tabla_principal)
             st.dataframe(df_principal, hide_index=True, use_container_width=True)
-            
-            # Botón descarga
-            csv = df_principal.to_csv(index=False)
-            st.download_button("📥 Descargar CSV", csv, "tabla_principal.csv", "text/csv")
-        
+            col_csv, col_excel = st.columns(2)
+            with col_csv:
+                csv = df_principal.to_csv(index=False)
+                st.download_button("📥 Descargar CSV", csv, "tabla_principal.csv", "text/csv")
+            with col_excel:
+                excel = to_excel(df_principal)
+                st.download_button("📥 Descargar Excel", excel, "tabla_principal.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                
         with tab2:
             st.markdown("### 📊 Base de Granjas")
             st.dataframe(granjas_actualizadas, hide_index=True)
-            
+            col_csv, col_excel = st.columns(2)
+            with col_csv:
+                csv_granjas = granjas_actualizadas.to_csv(index=False)
+                st.download_button("📥 Descargar CSV", csv_granjas, "base_granjas.csv", "text/csv")
+            with col_excel:
+                excel_granjas = to_excel(granjas_actualizadas)
+                st.download_button("📥 Descargar Excel", excel_granjas, "base_granjas.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
             st.markdown("### ⚡ Comunidades Energéticas (muestra)")
             st.dataframe(comunidades.head(50), hide_index=True) 
             st.info(f"Mostrando 50 de {len(comunidades)} comunidades")
+
+            col_csv, col_excel = st.columns(2)
+            with col_csv:
+                csv_comunidades = comunidades.head(50).to_csv(index=False)
+                st.download_button("📥 Descargar CSV", csv_comunidades, "comunidades_muestra.csv", "text/csv")
+            with col_excel:
+                excel_comunidades = to_excel(comunidades.head(50))
+                st.download_button("📥 Descargar Excel", excel_comunidades, "comunidades_muestra.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
 if __name__ == "__main__":
     main()

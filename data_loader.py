@@ -4,7 +4,7 @@ Módulo para cargar y procesar datos
 import pandas as pd
 import streamlit as st
 from io import BytesIO
-from config import DATA_FILES
+from config_original import DATA_FILES
 
 @st.cache_data
 def cargar_datos():
@@ -26,11 +26,11 @@ def cargar_datos():
         return None, None, None, None, None
 
 def to_excel(df):
-    """Convertir DataFrame a Excel y retornar bytes"""
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Datos')
-    return output.getvalue()
+    processed_data = output.getvalue()
+    return processed_data
 
 def crear_tabla_principal(granjas_actualizadas, estadisticas):
     """Crear tabla principal con todos los datos"""

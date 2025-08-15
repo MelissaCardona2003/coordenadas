@@ -17,7 +17,7 @@ def main():
     try:
         # Ejecutar Streamlit con configuración optimizada
         subprocess.run([
-            "streamlit", "run", "dashboard_limpio.py",
+            "streamlit", "run", "dashboard_estable.py",
             "--server.port=8503",
             "--server.runOnSave=true",
             "--server.allowRunOnSave=true",
